@@ -1,10 +1,139 @@
-<!DOCTYPE HTML>
-<HTML>
-  <HEAD>
-    <META CHARSET="UTF-8">
-    <TITLE>CHUN_RONG，GITHUB</TITLE>
-  </HEAD>
-  <BODY>
-    <H1>第一個網站，那你很棒毆!!</H1>
-  </BODY>
-</HTML>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>番茄鐘計時器與待辦事項列表</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #timer {
+            font-size: 48px;
+            margin: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #todo-list {
+            width: 300px;
+            margin: 20px;
+        }
+        #todo-list input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            background-color: #fff;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        li.completed {
+            text-decoration: line-through;
+            color: grey;
+        }
+        #text-to-speech {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="timer">
+        25:00
+    </div>
+    <button id="start-btn">開始</button>
+    <button id="reset-btn">重設</button>
+
+    <div id="todo-list">
+        <input type="text" id="new-todo" placeholder="新增待辦事項">
+        <ul id="todos"></ul>
+    </div>
+
+    <div id="text-to-speech">
+        <input type="text" id="text-input" placeholder="輸入要轉換的文字">
+        <button id="speak-btn">轉換為語音</button>
+    </div>
+
+    <script>
+        // 番茄鐘計時器
+        let timer;
+        let timeLeft = 25 * 60;
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timer);
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeft = 25 * 60;
+            updateTimerDisplay();
+        }
+
+        startBtn.addEventListener('click', startTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        updateTimerDisplay();
+
+        // 待辦事項列表
+        const newTodoInput = document.getElementById('new-todo');
+        const todosUl = document.getElementById('todos');
+
+        newTodoInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && newTodoInput.value.trim() !== '') {
+                const li = document.createElement('li');
+                li.textContent = newTodoInput.value.trim();
+                li.addEventListener('click', () => {
+                    li.classList.toggle('completed');
+                });
+                todosUl.appendChild(li);
+                newTodoInput.value = '';
+            }
+        });
+
+        // 文字轉語音功能
+        const textInput = document.getElementById('text-input');
+        const speakBtn = document.getElementById('speak-btn');
+
+        speakBtn.addEventListener('click', () => {
+            const text = textInput.value.trim();
+            if (text !== '') {
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.lang = 'zh-TW';
+                window.speechSynthesis.speak(speech);
+            }
+        });
+    </script>
+</body>
+</html>
